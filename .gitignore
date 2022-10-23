@@ -1,0 +1,4 @@
+apps
+mysql
+mysqld_exporter
+prometheus
