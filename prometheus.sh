@@ -1,7 +1,7 @@
 #!/bin/bash
 
 
-URL='https://objects.githubusercontent.com/github-production-release-asset-2e65be/6838921/81e7d819-6f49-4463-8ae6-caab757e9ced?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAIWNJYAX4CSVEH53A%2F20221023%2Fus-east-1%2Fs3%2Faws4_request&X-Amz-Date=20221023T161542Z&X-Amz-Expires=300&X-Amz-Signature=1e0b59caf95a5521f7cfb4faeb3e588cded0e00d70a2247d02d8b6c88e9c622b&X-Amz-SignedHeaders=host&actor_id=1914023&key_id=0&repo_id=6838921&response-content-disposition=attachment%3B%20filename%3Dprometheus-2.39.1.linux-amd64.tar.gz&response-content-type=application%2Foctet-stream'
+URL='https://github.com/prometheus/prometheus/releases/download/v2.39.1/prometheus-2.39.1.linux-amd64.tar.gz'
 
 cd $APP_DIR
 PROMETHEUS_PACKAGE=prometheus-2.39.1.linux-amd64
@@ -13,7 +13,7 @@ else
         tar zxvf ${PROMETHEUS_PACKAGE}.tar.gz
     else
         echo 'download and extracting'
-        curl -o $APP_DIR/${PROMETHEUS_PACKAGE}.tar.gz $URL && tar zxvf ${PROMETHEUS_PACKAGE}.tar.gz
+        curl -o $APP_DIR/${PROMETHEUS_PACKAGE}.tar.gz -L $URL && tar zxvf ${PROMETHEUS_PACKAGE}.tar.gz
     fi
 fi
 ln -s $APP_DIR/$PROMETHEUS_PACKAGE $WORKSPACE/prometheus

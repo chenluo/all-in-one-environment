@@ -25,7 +25,7 @@ $MYSQL_DIR/bin/mysqld --initialize-insecure --user=mysql --basedir=$MYSQL_DIR
 $MYSQL_DIR/bin/mysql_ssl_rsa_setup --datadir=$MYSQL_DIR/data
 $MYSQL_DIR/bin/mysqld_safe --user=mysql --basedir=$MYSQL_DIR --datadir=$MYSQL_DIR/data \
     --log-error --log-bin --socket=$MYSQL_DIR/mysql.sock --default-storage-engine=InnoDB \
-    --general-log=1 --general-log-file --slow-query-log=1 --long_query-time=1\
+    --general-log=1 --general-log-file --slow-query-log --long_query-time=1\
     --slow-query-log-file &
 
 sleep 3
@@ -33,10 +33,10 @@ sleep 3
 # add user
 export MYSQL_USER_NAME=chen
 export MYSQL_PASSWORD="$(openssl rand -base64 12)"
-echo "random password: $MYSQL_PASSWORD"
+echo "$MYSQL_PASSWORD"
 MYSQL_LOGIN_PARAM="-uroot --skip-password -S ${MYSQL_DIR}/mysql.sock"
 # localhost access
-$MYSQL_DIR/bin/mysql $MYSQL_LOGIN_PARAM -e "CREATE USER ${MYSQL_USER_NAME}@localhost IDENTIFIED BY '${MYSQL_PASSWORD}';" &&  echo "random password: $MYSQL_PASSWORD" > $MYSQL_DIR/mysql.password
+$MYSQL_DIR/bin/mysql $MYSQL_LOGIN_PARAM -e "CREATE USER ${MYSQL_USER_NAME}@localhost IDENTIFIED BY '${MYSQL_PASSWORD}';" &&  echo "$MYSQL_PASSWORD" > $MYSQL_DIR/mysql.password
 $MYSQL_DIR/bin/mysql $MYSQL_LOGIN_PARAM -e "GRANT ALL PRIVILEGES ON *.* TO '${MYSQL_USER_NAME}'@'localhost';"
 # remote access
 $MYSQL_DIR/bin/mysql $MYSQL_LOGIN_PARAM -e "CREATE USER ${MYSQL_USER_NAME}@'%' IDENTIFIED BY '${MYSQL_PASSWORD}';"
