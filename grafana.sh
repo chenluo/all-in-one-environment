@@ -6,7 +6,7 @@ if [ $PRE = true ]; then
     URL='https://dl.grafana.com/oss/release/grafana-9.2.2.linux-amd64.tar.gz'
 
     GRAFANA_PACKAGE=grafana-9.2.2.linux-amd64
-    if [ -d $APP_DIR/$GRAFANA_PACKAGE ];then
+    if [ -d $APP_DIR/grafana-9.2.2 ];then
         echo 'extracted'
     else
         if [ -f $APP_DIR/${GRAFANA_PACKAGE}.tar.gz ];then

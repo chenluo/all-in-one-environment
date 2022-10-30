@@ -29,8 +29,8 @@ fi
 if [ $RUN = true ] || [ $PRE = true ]; then
     $MYSQL_DIR/bin/mysqld_safe --user=mysql --basedir=$MYSQL_DIR --datadir=$MYSQL_DIR/data \
         --log-error --log-bin --socket=$MYSQL_DIR/mysql.sock --default-storage-engine=InnoDB \
-        --general-log=1 --general-log-file --slow-query-log --long_query-time=1\
-        --slow-query-log-file &
+        --general-log=1 --general-log-file general.log --slow-query-log=1 --long_query-time=1\
+        --slow-query-log-file slow.log  &
 
     sleep 3
 fi
