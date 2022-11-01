@@ -4,3 +4,4 @@ mysqld_exporter
 prometheus
 grafana
 node_exporter
+zookeeper
