@@ -40,7 +40,7 @@ scrape_configs:
         - targets: ['localhost:9402']
   - job_name: "zookeeper"
     static_configs:
-        - targets: ['localhost:2901']
+        - targets: ['localhost:7000']
   - job_name: "tomcat"
     static_configs:
         - targets: ['localhost:8090']
