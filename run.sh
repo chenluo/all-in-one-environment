@@ -1,6 +1,9 @@
 #!/bin/bash
 
-source ./config.sh
+CUR="${BASH_SOURCE-$0}"
+CUR="$(dirname "${CUR}")"
+CUR_DIR="$(cd "${CUR}"; pwd)"
+source $CUR_DIR/config.sh
 
 SKIP=true
 export PRE=false
@@ -10,14 +13,13 @@ if [ $# -eq 0 ]; then
     exit 0
 fi
 
-if [ ! -z "$1" ]; then
-    if [ $1 = pre ]; then
-        export PRE=true
-        shift
-    fi
-
+if [ ! -z $1 ]; then
     if [ $1 = run ]; then
         export RUN=true
+        shift
+    fi
+    if [ $1 = pre ]; then
+        export PRE=true
         shift
     fi
 fi
@@ -27,7 +29,6 @@ if [ ! -z $1 ]; then
         export PRE=true
         shift
     fi
-
     if [ $1 = run ]; then
         export RUN=true
         shift
