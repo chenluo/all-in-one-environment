@@ -26,5 +26,8 @@ fi
 
 if [ $RUN = true ]; then
     cd $ZOOKEEPER_DIR
+    #export JVMFLAGS=-javaagent:$WORKSPACE/jmx_exporter/jmx_prometheus_javaagent-0.17.2.jar=2901:$CONFIG_DIR/jmx_exporter_cfgs/zookeeper.yml
+
     nohup ./bin/zkServer.sh start 2>&1 > $ZOOKEEPER_DIR/zookeeper.log &
+    #unset JVMFLAGS
 fi
