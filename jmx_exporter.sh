@@ -6,7 +6,7 @@ if [ $PRE = true ]; then
     URL='https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.17.2/jmx_prometheus_javaagent-0.17.2.jar'
 
     JMX_EXPORTER_PACKAGE=jmx_prometheus_javaagent-0.17.2.jar
-    if [ -d $APP_DIR/$JMX_EXPORTER_PACKAGE ];then
+    if [ -f $APP_DIR/$JMX_EXPORTER_PACKAGE ];then
         echo 'downloaded'
     else
         echo 'download'
