@@ -47,6 +47,13 @@ echo RUN:$RUN
 echo SKIP:$SKIP
 
 if [ $SKIP = false ]; then
-    source $WORKSPACE/mysql.sh && source $WORKSPACE/mysqld_exporter.sh && source $WORKSPACE/prometheus.sh && source $WORKSPACE/grafana.sh && source $WORKSPACE/node_exporter.sh && source $WORKSPACE/zookeeper.sh && source $WORKSPACE/jmx_exporter.sh
+    source $WORKSPACE/mysql.sh \
+    && source $WORKSPACE/mysqld_exporter.sh \
+    && source $WORKSPACE/prometheus.sh \
+    && source $WORKSPACE/grafana.sh \
+    && source $WORKSPACE/node_exporter.sh \
+    && source $WORKSPACE/zookeeper.sh \
+    && source $WORKSPACE/jmx_exporter.sh \
+    && source $WORKSPACE/cassandra.sh
 fi
 

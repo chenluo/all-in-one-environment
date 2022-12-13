@@ -15,5 +15,6 @@ if [ $PRE = true ]; then
     mkdir $APP_DIR/jmx_exporter
     cp $APP_DIR/$JMX_EXPORTER_PACKAGE $APP_DIR/jmx_exporter
     ln -s $APP_DIR/jmx_exporter $WORKSPACE/jmx_exporter
+    echo ""
 
 fi

@@ -31,3 +31,4 @@ if [ $RUN = true ]; then
     nohup ./bin/zkServer.sh start 2>&1 > $ZOOKEEPER_DIR/zookeeper.log &
     #unset JVMFLAGS
 fi
+
