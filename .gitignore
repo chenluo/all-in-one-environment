@@ -7,3 +7,4 @@ node_exporter
 zookeeper
 jmx_exporter
 cassandra
+build
