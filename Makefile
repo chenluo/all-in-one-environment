@@ -1,4 +1,4 @@
-.ONESHELL:
+.ONESHELL: # in each target, it will use the same shell.
 
 appTar = ${newAppTar}
 appDir = ${newAppDir}
@@ -50,28 +50,35 @@ ifeq (,$(wildcard ${appDir}))
 	tar zxvf ${appTar}
 endif
 
+
+##
+## basic settings
+##
+##
+
 set_cassandra:
 	@$(eval newAppTar = cassandra.tar.gz)
 	@$(eval newAppDir = apache-cassandra-3.11.2)
 	@$(eval newAppUrl = https://archive.apache.org/dist/cassandra/3.11.2/apache-cassandra-3.11.2-bin.tar.gz)
 
+set_zk:
+	@$(eval newAppTar = zk.tar.gz)
+	@$(eval newAppDir = apache-zookeeper-3.8.0-bin)
+	@$(eval newAppUrl = https://dlcdn.apache.org/zookeeper/zookeeper-3.8.0/apache-zookeeper-3.8.0-bin.tar.gz)
+
+
+##
+## ZooKeeper targets
+##
+##
 download_cassandra: set_cassandra download
 	@echo 'download cassandra'
-	@echo ${appTar}
-	@echo ${appDir}
-	@echo ${appUrl}
 
 extract_cassandra: set_cassandra extract
 	@echo 'extract cassandra'
-	@echo ${appTar}
-	@echo ${appDir}
-	@echo ${appUrl}
 
 prepare_cassandra: download_cassandra extract_cassandra
 	@echo 'prepare cassandra'
-	@echo ${appTar}
-	@echo ${appDir}
-	@echo ${appUrl}
 
 run_cassandra: set_cassandra
 	cd ${topdir}/${appRoot}/${appDir}
@@ -85,6 +92,37 @@ is_running_cassandra:
 	lsof -i:9042
 
 clean_cassandra: set_cassandra
+	cd ${topdir}/${appRoot}
+	rm -rf ${appDir}
+	rm ${appTar}
+
+download_zk: set_zk download
+	@echo 'download zk'
+
+##
+## ZooKeeper targets
+##
+##
+extract_zk: set_zk extract
+	@echo 'extract zk'
+
+prepare_zk: download_zk extract_zk
+	@echo 'prepare zk'
+	ln -s ${topdir}/config/zoo.cfg ${topdir}/${appRoot}/${appDir}/conf/zoo.cfg
+
+
+run_zk: set_zk
+	cd ${topdir}/${appRoot}/${appDir}
+	JAVA_HOME=/home/chen/.jdks/azul-1.8.0_275
+	nohup ./bin/zkServer.sh start 2>&1 > ./zookeeper.log &
+
+kill_zk: is_running_zk
+	kill `lsof -i:2181 -t`
+
+is_running_zk:
+	lsof -i:2181
+
+clean_zk: set_zk
 	cd ${topdir}/${appRoot}
 	rm -rf ${appDir}
 	rm ${appTar}
