@@ -3,6 +3,22 @@
 appTar = ${newAppTar}
 appDir = ${newAppDir}
 appUrl = ${newAppUrl}
+OS = 
+ARCH = 
+UNAME_S := $(shell uname -s)
+ifeq ($(UNAME_S),Linux)
+	OS = LINUX
+endif
+ifeq ($(UNAME_S),Darwin)
+	OS = OSX
+endif
+UNAME_P := $(shell uname -p)
+ifeq ($(UNAME_P),x86_64)
+	ARCH = AMD64
+endif
+ifneq ($(filter arm%,$(UNAME_P)),)
+	ARCH = ARM
+endif
 
 appRoot = apps
 
@@ -79,18 +95,33 @@ set_jmx_exporter:
 
 set_node_exporter:
 	@$(eval newAppTar = node_exporter.tar.gz)
+ifeq (LINUX,${OS})
 	@$(eval newAppDir = node_exporter-1.4.0.linux-amd64)
 	@$(eval newAppUrl = https://github.com/prometheus/node_exporter/releases/download/v1.4.0/node_exporter-1.4.0.linux-amd64.tar.gz)
+else
+	@$(eval newAppDir = node_exporter-1.5.0.darwin-amd64)
+	@$(eval newAppUrl = https://github.com/prometheus/node_exporter/releases/download/v1.5.0/node_exporter-1.5.0.darwin-amd64.tar.gz)
+endif
 
 set_grafana:
 	@$(eval newAppTar = grafana.tar.gz)
+ifeq (LINUX,${OS})
 	@$(eval newAppDir = grafana-9.2.2)
 	@$(eval newAppUrl = https://dl.grafana.com/oss/release/grafana-9.2.2.linux-amd64.tar.gz)
+else
+	@$(eval newAppDir = grafana-9.3.2)
+	@$(eval newAppUrl = https://dl.grafana.com/enterprise/release/grafana-enterprise-9.3.2.darwin-amd64.tar.gz)
+endif
 
 set_prometheus:
 	@$(eval newAppTar = prometheus.tar.gz)
+ifeq (LINUX,${OS})
 	@$(eval newAppDir = prometheus-2.39.1.linux-amd64)
 	@$(eval newAppUrl = https://github.com/prometheus/prometheus/releases/download/v2.39.1/prometheus-2.39.1.linux-amd64.tar.gz)
+else
+	@$(eval newAppDir = prometheus-2.37.5.darwin-amd64)
+	@$(eval newAppUrl = https://github.com/prometheus/prometheus/releases/download/v2.37.5/prometheus-2.37.5.darwin-amd64.tar.gz)
+endif
 
 ##
 ## ZooKeeper targets
