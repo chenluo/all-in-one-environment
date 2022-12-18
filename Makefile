@@ -74,6 +74,11 @@ set_jmx_exporter:
 	@$(eval newAppDir = jmx_exporter)
 	@$(eval newAppUrl = https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.17.2/jmx_prometheus_javaagent-0.17.2.jar)
 
+set_node_exporter:
+	@$(eval newAppTar = node_exporter.tar.gz)
+	@$(eval newAppDir = node_exporter-1.4.0.linux-amd64)
+	@$(eval newAppUrl = https://github.com/prometheus/node_exporter/releases/download/v1.4.0/node_exporter-1.4.0.linux-amd64.tar.gz)
+
 set_grafana:
 	@$(eval newAppTar = grafana.tar.gz)
 	@$(eval newAppDir = grafana-9.2.2)
@@ -200,11 +205,37 @@ is_running_prometheus:
 clean_prometheus: set_prometheus clean_single
 
 ##
+## promethus targets
+##
+##
+download_node_exporter: set_node_exporter download
+	@echo 'download node_exporter'
+
+extract_node_exporter: set_node_exporter extract
+	@echo 'extract node_exporter'
+
+prepare_node_exporter: download_node_exporter extract_node_exporter
+	@echo 'prepare node_exporter'
+
+run_node_exporter: set_node_exporter
+	cd ${topdir}/${appRoot}/${appDir}
+	nohup ./node_exporter 2>&1 > ./node_exporter.log &
+
+kill_node_exporter: is_running_node_exporter
+	kill `lsof -i:9100 -t`
+
+is_running_node_exporter:
+	lsof -i:9100
+
+clean_node_exporter: set_node_exporter clean_single
+
+##
 ## *_all targets
 ##
-prepare_all: prepare_cassandra prepare_jmx_exporter prepare_zk
+prepare_all: prepare_cassandra prepare_jmx_exporter prepare_zk prepare_prometheus prepare_grafana
+	@echo 'prepare all success'
 
-run_all: run_cassandra run_zk
+run_all: run_cassandra run_zk run_grafana run_prometheus
 	@echo 'run all success'
 
 all: prepare_all run_all
