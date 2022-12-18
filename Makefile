@@ -79,6 +79,10 @@ set_grafana:
 	@$(eval newAppDir = grafana-9.2.2)
 	@$(eval newAppUrl = https://dl.grafana.com/oss/release/grafana-9.2.2.linux-amd64.tar.gz)
 
+set_prometheus:
+	@$(eval newAppTar = prometheus.tar.gz)
+	@$(eval newAppDir = prometheus-2.39.1.linux-amd64)
+	@$(eval newAppUrl = https://github.com/prometheus/prometheus/releases/download/v2.39.1/prometheus-2.39.1.linux-amd64.tar.gz)
 
 ##
 ## ZooKeeper targets
@@ -119,7 +123,6 @@ extract_zk: set_zk extract
 prepare_zk: download_zk extract_zk
 	@echo 'prepare zk'
 	ln -s ${topdir}/config/zoo.cfg ${topdir}/${appRoot}/${appDir}/conf/zoo.cfg
-
 
 run_zk: set_zk
 	cd ${topdir}/${appRoot}/${appDir}
@@ -170,6 +173,31 @@ download_jmx_exporter: set_jmx_exporter download
 prepare_jmx_exporter: download_jmx_exporter
 	@echo 'prepare jmx exporter'
 
+##
+## promethus targets
+##
+##
+download_prometheus: set_prometheus download
+	@echo 'download prometheus'
+
+extract_prometheus: set_prometheus extract
+	@echo 'extract prometheus'
+
+prepare_prometheus: download_prometheus extract_prometheus
+	@echo 'prepare prometheus'
+	cp -f ${topdir}/config/prometheus.yml ${topdir}/${appRoot}/${appDir}/
+
+run_prometheus: set_prometheus
+	cd ${topdir}/${appRoot}/${appDir}
+	nohup ./prometheus --config.file ./prometheus.yml 2>&1 > ./prometheus.log &
+
+kill_prometheus: is_running_prometheus
+	kill `lsof -i:9090 -t`
+
+is_running_prometheus:
+	lsof -i:9090
+
+clean_prometheus: set_prometheus clean_single
 
 ##
 ## *_all targets
