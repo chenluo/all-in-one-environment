@@ -232,10 +232,10 @@ clean_node_exporter: set_node_exporter clean_single
 ##
 ## *_all targets
 ##
-prepare_all: prepare_cassandra prepare_jmx_exporter prepare_zk prepare_prometheus prepare_grafana
+prepare_all: prepare_cassandra prepare_jmx_exporter prepare_zk prepare_prometheus prepare_grafana prepare_node_exporter
 	@echo 'prepare all success'
 
-run_all: run_cassandra run_zk run_grafana run_prometheus
+run_all: run_cassandra run_zk run_grafana run_prometheus run_node_exporter
 	@echo 'run all success'
 
 all: prepare_all run_all
