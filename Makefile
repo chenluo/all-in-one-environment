@@ -49,6 +49,10 @@ ifeq (,$(wildcard ${appDir}))
 	tar zxvf ${appTar}
 endif
 
+clean_single: checkDir checkTar
+	cd ${topdir}/${appRoot}
+	rm -rf ${appDir}
+	rm ${appTar}
 
 ##
 ## basic settings
@@ -69,6 +73,11 @@ set_jmx_exporter:
 	@$(eval newAppTar = jmx_exporter.jar)
 	@$(eval newAppDir = jmx_exporter)
 	@$(eval newAppUrl = https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.17.2/jmx_prometheus_javaagent-0.17.2.jar)
+
+set_grafana:
+	@$(eval newAppTar = grafana.tar.gz)
+	@$(eval newAppDir = grafana-9.2.2)
+	@$(eval newAppUrl = https://dl.grafana.com/oss/release/grafana-9.2.2.linux-amd64.tar.gz)
 
 
 ##
@@ -95,10 +104,7 @@ kill_cassandra: is_running_cassandra
 is_running_cassandra:
 	lsof -i:9042
 
-clean_cassandra: set_cassandra
-	cd ${topdir}/${appRoot}
-	rm -rf ${appDir}
-	rm ${appTar}
+clean_cassandra: set_cassandra clean_single
 
 ##
 ## ZooKeeper targets
@@ -126,10 +132,33 @@ kill_zk: is_running_zk
 is_running_zk:
 	lsof -i:2181
 
-clean_zk: set_zk
-	cd ${topdir}/${appRoot}
-	rm -rf ${appDir}
-	rm ${appTar}
+clean_zk: set_zk clean_single
+
+##
+## grafana targets
+##
+##
+download_grafana: set_grafana download
+	@echo 'download grafana'
+
+extract_grafana: set_grafana extract
+	@echo 'extract grafana'
+
+prepare_grafana: download_grafana extract_grafana
+	@echo 'prepare grafana'
+
+run_grafana: set_grafana
+	cd ${topdir}/${appRoot}/${appDir}
+	JAVA_HOME=/home/chen/.jdks/azul-1.8.0_275
+	nohup ./bin/grafana-server start 2>&1 > ./grafana.log &
+
+kill_grafana: is_running_grafana
+	kill `lsof -i:3000 -t`
+
+is_running_grafana:
+	lsof -i:3000
+
+clean_grafana: set_grafana clean_single
 
 ##
 ## jmx exporter
@@ -141,11 +170,14 @@ download_jmx_exporter: set_jmx_exporter download
 prepare_jmx_exporter: download_jmx_exporter
 	@echo 'prepare jmx exporter'
 
+
+##
+## *_all targets
+##
 prepare_all: prepare_cassandra prepare_jmx_exporter prepare_zk
 
 run_all: run_cassandra run_zk
 	@echo 'run all success'
-
 
 all: prepare_all run_all
 	@echo 'all'
