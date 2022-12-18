@@ -14,6 +14,9 @@ else
 endif
 topdir := $(strip $(patsubst %/, %, $(dir $(makefile_path))))
 
+configure:
+	mkdir apps
+
 checkTar:
 ifndef appTar
 	@echo "appTar not defined"
@@ -104,7 +107,6 @@ prepare_cassandra: download_cassandra extract_cassandra
 
 run_cassandra: set_cassandra
 	cd ${topdir}/${appRoot}/${appDir}
-	JAVA_HOME=/home/chen/.jdks/azul-1.8.0_275
 	./bin/cassandra
 
 kill_cassandra: is_running_cassandra
@@ -131,7 +133,6 @@ prepare_zk: download_zk extract_zk
 
 run_zk: set_zk
 	cd ${topdir}/${appRoot}/${appDir}
-	JAVA_HOME=/home/chen/.jdks/azul-1.8.0_275
 	nohup ./bin/zkServer.sh start 2>&1 > ./zookeeper.log &
 
 kill_zk: is_running_zk
@@ -157,7 +158,6 @@ prepare_grafana: download_grafana extract_grafana
 
 run_grafana: set_grafana
 	cd ${topdir}/${appRoot}/${appDir}
-	JAVA_HOME=/home/chen/.jdks/azul-1.8.0_275
 	nohup ./bin/grafana-server start 2>&1 > ./grafana.log &
 
 kill_grafana: is_running_grafana
