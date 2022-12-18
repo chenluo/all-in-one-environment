@@ -36,7 +36,6 @@ download: checkTar checkUrl
 	cd ${topdir}/${appRoot}
 ifeq (,$(wildcard ${appTar}))
 	@echo "tar file not exists. Start downloading......"
-	echo $(pwd)
 	curl -o ${appTar} -L "${appUrl}"
 else
 	ls ${appTar}
@@ -65,6 +64,11 @@ set_zk:
 	@$(eval newAppTar = zk.tar.gz)
 	@$(eval newAppDir = apache-zookeeper-3.8.0-bin)
 	@$(eval newAppUrl = https://dlcdn.apache.org/zookeeper/zookeeper-3.8.0/apache-zookeeper-3.8.0-bin.tar.gz)
+
+set_jmx_exporter:
+	@$(eval newAppTar = jmx_exporter.jar)
+	@$(eval newAppDir = jmx_exporter)
+	@$(eval newAppUrl = https://repo1.maven.org/maven2/io/prometheus/jmx/jmx_prometheus_javaagent/0.17.2/jmx_prometheus_javaagent-0.17.2.jar)
 
 
 ##
@@ -96,13 +100,13 @@ clean_cassandra: set_cassandra
 	rm -rf ${appDir}
 	rm ${appTar}
 
-download_zk: set_zk download
-	@echo 'download zk'
-
 ##
 ## ZooKeeper targets
 ##
 ##
+download_zk: set_zk download
+	@echo 'download zk'
+
 extract_zk: set_zk extract
 	@echo 'extract zk'
 
@@ -126,3 +130,22 @@ clean_zk: set_zk
 	cd ${topdir}/${appRoot}
 	rm -rf ${appDir}
 	rm ${appTar}
+
+##
+## jmx exporter
+## only download is enough
+##
+download_jmx_exporter: set_jmx_exporter download
+	@echo 'download jmx exporter'
+
+prepare_jmx_exporter: download_jmx_exporter
+	@echo 'prepare jmx exporter'
+
+prepare_all: prepare_cassandra prepare_jmx_exporter prepare_zk
+
+run_all: run_cassandra run_zk
+	@echo 'run all success'
+
+
+all: prepare_all run_all
+	@echo 'all'
