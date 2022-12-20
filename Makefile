@@ -80,8 +80,13 @@ clean_single: checkDir checkTar
 
 set_cassandra:
 	@$(eval newAppTar = cassandra.tar.gz)
+ifeq (LINUX,${OS})
 	@$(eval newAppDir = apache-cassandra-3.11.2)
 	@$(eval newAppUrl = https://archive.apache.org/dist/cassandra/3.11.2/apache-cassandra-3.11.2-bin.tar.gz)
+else
+	@$(eval newAppDir = apache-cassandra-4.0.7)
+	@$(eval newAppUrl = https://dlcdn.apache.org/cassandra/4.0.7/apache-cassandra-4.0.7-bin.tar.gz)
+endif
 
 set_zk:
 	@$(eval newAppTar = zk.tar.gz)
