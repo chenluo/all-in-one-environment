@@ -143,6 +143,7 @@ prepare_cassandra: download_cassandra extract_cassandra
 
 run_cassandra: set_cassandra
 	cd ${topdir}/${appRoot}/${appDir}
+	export JVM_OPTS=-javaagent:${topdir}/${appRoot}/jmx_exporter.jar=9141:${topdir}/config/jmx_exporter_cfgs/cassandra.yml
 	./bin/cassandra
 
 kill_cassandra: is_running_cassandra
