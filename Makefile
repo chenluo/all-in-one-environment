@@ -293,6 +293,12 @@ run_redis: set_redis_source
 	cd ${topdir}/${appRoot}/${appDir}
 	nohup ./src/redis-server 2>&1 > ./redis.log &
 
+kill_redis: is_running_redis
+	kill `lsof -i:6379 -t`
+
+is_running_redis:
+	lsof -i:6379
+
 
 ##
 ## *_all targets
