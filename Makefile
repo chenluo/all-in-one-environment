@@ -286,6 +286,7 @@ prepare_redis_source: download_redis_source extract_redis_source
 	@echo 'prepare_redis_source'
 	cd ${topdir}/${appRoot}/${appDir}
 	make
+	make PREFIX=./ install
 
 run_redis: set_redis_source
 	@echo 'run_redis_source'
