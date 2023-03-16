@@ -128,6 +128,11 @@ else
 	@$(eval newAppUrl = https://github.com/prometheus/prometheus/releases/download/v2.37.5/prometheus-2.37.5.darwin-amd64.tar.gz)
 endif
 
+set_redis_source:
+	@$(eval newAppTar = redis-stable.tar.gz)
+	@$(eval newAppDir = redis-stable)
+	@$(eval newAppUrl = https://download.redis.io/redis-stable.tar.gz)
+
 ##
 ## ZooKeeper targets
 ##
@@ -266,13 +271,35 @@ is_running_node_exporter:
 
 clean_node_exporter: set_node_exporter clean_single
 
+
+##
+## redis-source
+##
+##
+download_redis_source: set_redis_source download
+	@echo 'download_redis_source'
+
+extract_redis_source: set_redis_source extract
+	@echo 'download_redis_source'
+
+prepare_redis_source: download_redis_source extract_redis_source 
+	@echo 'prepare_redis_source'
+	cd ${topdir}/${appRoot}/${appDir}
+	make
+
+run_redis: set_redis_source
+	@echo 'run_redis_source'
+	cd ${topdir}/${appRoot}/${appDir}
+	nohup ./src/redis-server 2>&1 > ./redis.log &
+
+
 ##
 ## *_all targets
 ##
-prepare_all: prepare_cassandra prepare_jmx_exporter prepare_zk prepare_prometheus prepare_grafana prepare_node_exporter
+prepare_all: prepare_cassandra prepare_jmx_exporter prepare_zk prepare_prometheus prepare_grafana prepare_node_exporter prepare_redis_source
 	@echo 'prepare all success'
 
-run_all: run_cassandra run_zk run_grafana run_prometheus run_node_exporter
+run_all: run_cassandra run_zk run_grafana run_prometheus run_node_exporter run_redis
 	@echo 'run all success'
 
 all: prepare_all run_all
