@@ -133,8 +133,12 @@ set_redis_source:
 	@$(eval newAppDir = redis-stable)
 	@$(eval newAppUrl = https://download.redis.io/redis-stable.tar.gz)
 
+set_postgresql_source:
+	@$(eval newAppTar = postgresql-14.7.tar.gz)
+	@$(eval newAppDir = postgresql-14.7)
+	@$(eval newAppUrl = https://ftp.postgresql.org/pub/source/v14.7/postgresql-14.7.tar.gz)
+
 ##
-## ZooKeeper targets
 ##
 ##
 download_cassandra: set_cassandra download
@@ -285,6 +289,7 @@ extract_redis_source: set_redis_source extract
 prepare_redis_source: download_redis_source extract_redis_source 
 	@echo 'prepare_redis_source'
 	cd ${topdir}/${appRoot}/${appDir}
+	bash ./configure
 	make
 	make PREFIX=./ install
 
@@ -299,14 +304,43 @@ kill_redis: is_running_redis
 is_running_redis:
 	lsof -i:6379
 
+##
+## postgresql-source
+##
+##
+download_postgresql_source: set_postgresql_source download
+	@echo 'download_postgresql_source'
+
+extract_postgresql_source: set_postgresql_source extract
+	@echo 'download_postgresql_source'
+
+prepare_postgresql_source: download_postgresql_source extract_postgresql_source 
+	@echo 'prepare_postgresql_source'
+	cd ${topdir}/${appRoot}/${appDir}
+	bash configure --prefix=${topdir}/${appRoot}/${appDir}
+	$(MAKE) clean && $(MAKE) all && $(MAKE) install 
+	ls data || mkdir data
+	./bin/initdb -D ./data
+	@echo 'recusive make may failed.'
+
+run_postgresql: set_postgresql_source
+	@echo 'run_postgresql_source'
+	cd ${topdir}/${appRoot}/${appDir}
+	nohup ./bin/pg_ctl -D ./data -l logfile start &
+
+kill_postgresql: is_running_postgresql
+	kill `lsof -i:5432 -t`
+
+is_running_postgresql:
+	lsof -i:5432
 
 ##
 ## *_all targets
 ##
-prepare_all: prepare_cassandra prepare_jmx_exporter prepare_zk prepare_prometheus prepare_grafana prepare_node_exporter prepare_redis_source
+prepare_all: prepare_cassandra prepare_jmx_exporter prepare_zk prepare_prometheus prepare_grafana prepare_node_exporter prepare_redis_source prepare_postgresql_source
 	@echo 'prepare all success'
 
-run_all: run_cassandra run_zk run_grafana run_prometheus run_node_exporter run_redis
+run_all: run_cassandra run_zk run_grafana run_prometheus run_node_exporter run_redis run_postgresql
 	@echo 'run all success'
 
 all: prepare_all run_all
