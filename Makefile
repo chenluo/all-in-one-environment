@@ -335,6 +335,22 @@ is_running_postgresql:
 	lsof -i:5432
 
 ##
+## mysql docker
+##
+prepare_mysql:
+	@echo 'prepare for mysql docker'
+	mkdir ${topdir}/${appRoot}/mysql-dir
+
+run_mysql:
+	@echo 'run mysql docker'
+	docker start mysql8 || docker run --name mysql8 -v ${topdir}/${appRoot}/mysql-dir:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=mysql -p3306:3306 -d mysql:8.0.32
+
+kill_mysql:
+	@echo 'kill mysql docker'
+	docker stop mysql8
+	docker rm mysql8
+
+##
 ## *_all targets
 ##
 prepare_all: prepare_cassandra prepare_jmx_exporter prepare_zk prepare_prometheus prepare_grafana prepare_node_exporter prepare_redis_source prepare_postgresql_source
