@@ -93,6 +93,11 @@ set_zk:
 	@$(eval newAppDir = apache-zookeeper-3.8.0-bin)
 	@$(eval newAppUrl = https://dlcdn.apache.org/zookeeper/zookeeper-3.8.0/apache-zookeeper-3.8.0-bin.tar.gz)
 
+set_kafka:
+	@$(eval newAppTar = kafka_2.12-3.4.0.tgz)
+	@$(eval newAppDir = kafka_2.12-3.4.0)
+	@$(eval newAppUrl = https://downloads.apache.org/kafka/3.4.0/kafka_2.12-3.4.0.tgz)
+	
 set_jmx_exporter:
 	@$(eval newAppTar = jmx_exporter.jar)
 	@$(eval newAppDir = jmx_exporter)
@@ -139,7 +144,30 @@ set_postgresql_source:
 	@$(eval newAppUrl = https://ftp.postgresql.org/pub/source/v14.7/postgresql-14.7.tar.gz)
 
 ##
+## kafka
 ##
+download_kafka: set_kafka download
+	@echo 'download kafka'
+
+extract_kafka: set_kafka extract
+	@echo 'extract kafka'
+
+prepare_kafka: download_kafka extract_kafka
+	@echo 'prepare kafka'
+
+run_kafka: set_kafka
+	cd ${topdir}/${appRoot}/${appDir}
+	export JVM_OPTS=-javaagent:${topdir}/${appRoot}/jmx_exporter.jar=9400:${topdir}/config/jmx_exporter_cfgs/kafka_broker.yml
+	./bin/kafka-server-start.sh -daemon config/server.properties
+
+kill_kafka: set_kafka
+	cd ${topdir}/${appRoot}/${appDir}
+	./bin/kafka-server-stop.sh
+
+clean_kafka: set_kafka clean_single
+
+##
+## cassandra
 ##
 download_cassandra: set_cassandra download
 	@echo 'download cassandra'
