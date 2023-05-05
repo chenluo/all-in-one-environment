@@ -241,8 +241,7 @@ prepare_grafana: download_grafana extract_grafana
 	@echo 'prepare grafana'
 
 run_grafana: set_grafana
-	cd ${topdir}/${appRoot}/${appDir}
-	nohup ./bin/grafana-server start 2>&1 > ./grafana.log &
+	cd ${topdir}/${appRoot}/${appDir}  && nohup ./bin/grafana-server start 2>&1 > ./grafana.log &
 
 kill_grafana: is_running_grafana
 	kill `lsof -i:3000 -t`
