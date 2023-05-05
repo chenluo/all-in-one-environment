@@ -55,7 +55,7 @@ download: checkTar checkUrl
 	cd ${topdir}/${appRoot}
 ifeq (,$(wildcard ${appTar}))
 	@echo "tar file not exists. Start downloading......"
-	curl -o ${appTar} -L "${appUrl}"
+	/usr/bin/curl -o ${appTar} -L "${appUrl}"
 else
 	ls ${appTar}
 	@echo "downloaded"
@@ -111,6 +111,16 @@ ifeq (LINUX,${OS})
 else
 	@$(eval newAppDir = node_exporter-1.5.0.darwin-amd64)
 	@$(eval newAppUrl = https://github.com/prometheus/node_exporter/releases/download/v1.5.0/node_exporter-1.5.0.darwin-amd64.tar.gz)
+endif
+
+set_mysqld_exporter:
+	@$(eval newAppTar = mysqld_exporter.tar.gz)
+ifeq (LINUX,${OS})
+	@$(eval newAppDir = mysqld_exporter-0.15.0-rc.0.linux-amd64)
+	@$(eval newAppUrl = https://github.com/prometheus/mysqld_exporter/releases/download/v0.15.0-rc.0/mysqld_exporter-0.15.0-rc.0.linux-amd64.tar.gz)
+else
+	@$(eval newAppDir = mysqld_exporter-0.15.0-rc.0.darwin-amd64)
+	@$(eval newAppUrl = https://github.com/prometheus/mysqld_exporter/releases/download/v0.15.0-rc.0/mysqld_exporter-0.15.0-rc.0.darwin-amd64.tar.gz)
 endif
 
 set_grafana:
@@ -282,26 +292,25 @@ clean_prometheus: set_prometheus clean_single
 ## promethus targets
 ##
 ##
-download_node_exporter: set_node_exporter download
-	@echo 'download node_exporter'
+download_mysqld_exporter: set_mysqld_exporter download
+	@echo 'download mysqld_exporter'
 
-extract_node_exporter: set_node_exporter extract
-	@echo 'extract node_exporter'
+extract_mysqld_exporter: set_mysqld_exporter extract
+	@echo 'extract mysqld_exporter'
 
-prepare_node_exporter: download_node_exporter extract_node_exporter
-	@echo 'prepare node_exporter'
+prepare_mysqld_exporter: download_mysqld_exporter extract_mysqld_exporter
+	@echo 'prepare mysqld_exporter'
 
-run_node_exporter: set_node_exporter
-	cd ${topdir}/${appRoot}/${appDir}
-	nohup ./node_exporter 2>&1 > ./node_exporter.log &
+run_mysqld_exporter: set_mysqld_exporter
+	cd ${topdir}/${appRoot}/${appDir} &&  nohup ./mysqld_exporter --config.my-cnf ${topdir}/config/mysqld_exporter.conf --collect.auto_increment.columns --collect.binlog_size --collect.engine_innodb_status --collect.engine_tokudb_status --collect.global_status --web.listen-address=0.0.0.0:9104 2>&1 ./mysqld_exporter.log &
 
-kill_node_exporter: is_running_node_exporter
-	kill `lsof -i:9100 -t`
+kill_mysqld_exporter: is_running_mysqld_exporter
+	kill `lsof -i:9104 -t`
 
-is_running_node_exporter:
-	lsof -i:9100
+is_running_mysqld_exporter:
+	lsof -i:9104
 
-clean_node_exporter: set_node_exporter clean_single
+clean_mysqld_exporter: set_mysqld_exporter clean_single
 
 
 ##
@@ -377,6 +386,30 @@ kill_mysql:
 	@echo 'kill mysql docker'
 	docker stop mysql8
 	docker rm mysql8
+
+##
+## mysqld_exporter
+##
+download_node_exporter: set_node_exporter download
+	@echo 'download node_exporter'
+
+extract_node_exporter: set_node_exporter extract
+	@echo 'extract node_exporter'
+
+prepare_node_exporter: download_node_exporter extract_node_exporter
+	@echo 'prepare node_exporter'
+
+run_node_exporter: set_node_exporter
+	cd ${topdir}/${appRoot}/${appDir}
+	nohup ./node_exporter 2>&1 > ./node_exporter.log &
+
+kill_node_exporter: is_running_node_exporter
+	kill `lsof -i:9100 -t`
+
+is_running_node_exporter:
+	lsof -i:9100
+
+clean_node_exporter: set_node_exporter clean_single
 
 ##
 ## *_all targets
