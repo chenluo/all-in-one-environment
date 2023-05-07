@@ -301,7 +301,7 @@ prepare_mysqld_exporter: download_mysqld_exporter extract_mysqld_exporter
 	@echo 'prepare mysqld_exporter'
 
 run_mysqld_exporter: set_mysqld_exporter
-	cd ${topdir}/${appRoot}/${appDir} &&  nohup ./mysqld_exporter --config.my-cnf ${topdir}/config/mysqld_exporter.conf --collect.auto_increment.columns --collect.binlog_size --collect.engine_innodb_status --collect.engine_tokudb_status --collect.global_status --web.listen-address=0.0.0.0:9104 2>&1 ./mysqld_exporter.log &
+	cd ${topdir}/${appRoot}/${appDir} &&  nohup ./mysqld_exporter --config.my-cnf ${topdir}/config/mysqld_exporter.conf --collect.auto_increment.columns --collect.binlog_size --collect.engine_innodb_status --collect.engine_tokudb_status --collect.global_status --web.listen-address=0.0.0.0:9104 2>&1 > ./mysqld_exporter.log &
 
 kill_mysqld_exporter: is_running_mysqld_exporter
 	kill `lsof -i:9104 -t`
