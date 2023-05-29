@@ -377,14 +377,23 @@ prepare_mysql:
 	@echo 'prepare for mysql docker'
 	mkdir ${topdir}/${appRoot}/mysql-dir
 
-run_mysql:
+run_mysql_docker:
 	@echo 'run mysql docker'
-	docker start mysql8 || docker run --name mysql8 -v ${topdir}/${appRoot}/mysql-dir:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=mysql -p3306:3306 -d mysql:8.0.32
+ifeq (LINUX,${OS})
+	docker start mysql8 || docker run --name mysql8 -v ${topdir}/${appRoot}/mysql-dir/:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=mysql -p3306:3306 -d mysql:8.0.32
+else
+	podman start mysql8 || podman run --name mysql8 --user root -e MYSQL_ROOT_PASSWORD=mysql -p3306:3306 -d mysql:8.0.32
+endif
 
-kill_mysql:
+kill_mysql_docker:
 	@echo 'kill mysql docker'
+ifeq (LINUX,${OS})
 	docker stop mysql8
 	docker rm mysql8
+else
+	podman stop mysql8
+	podman rm mysql8
+endif
 
 ##
 ## mysqld_exporter
@@ -416,7 +425,7 @@ clean_node_exporter: set_node_exporter clean_single
 prepare_all: prepare_cassandra prepare_jmx_exporter prepare_zk prepare_prometheus prepare_grafana prepare_node_exporter prepare_redis_source prepare_postgresql_source
 	@echo 'prepare all success'
 
-run_all: run_cassandra run_zk run_grafana run_prometheus run_node_exporter run_redis run_postgresql
+run_all: run_cassandra run_zk run_grafana run_prometheus run_node_exporter run_redis run_postgresql run_mysql_docker
 	@echo 'run all success'
 
 all: prepare_all run_all
