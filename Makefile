@@ -382,7 +382,7 @@ run_mysql_docker:
 ifeq (LINUX,${OS})
 	docker start mysql8 || docker run --name mysql8 -v ${topdir}/${appRoot}/mysql-dir/:/var/lib/mysql -e MYSQL_ROOT_PASSWORD=mysql -p3306:3306 -d mysql:8.0.32
 else
-	podman start mysql8 || podman run --name mysql8 --user root -e MYSQL_ROOT_PASSWORD=mysql -p3306:3306 -d mysql:8.0.32
+	docker start mysql8 || docker run --name mysql8 --user root -e MYSQL_ROOT_PASSWORD=mysql -p3306:3306 -d mysql:8.0.32
 endif
 
 kill_mysql_docker:
@@ -391,8 +391,8 @@ ifeq (LINUX,${OS})
 	docker stop mysql8
 	docker rm mysql8
 else
-	podman stop mysql8
-	podman rm mysql8
+	docker stop mysql8
+	docker rm mysql8
 endif
 
 ##
