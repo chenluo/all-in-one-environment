@@ -1,2 +1,0 @@
-nohup: ./bin/pg_ctl: No such file or directory
-nohup: ./bin/pg_ctl: No such file or directory

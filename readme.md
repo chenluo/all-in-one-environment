@@ -1,8 +1,10 @@
 # all in one environment
-Infrastructure and monitoring tools
+Infrastructure and monitoring tools by docker-compose
 * mysql
+* zookeeper
+* kafka
 * prometheus
 * grafana
 
 ## usage
-./run.sh [pre,run]{1-2}
+docker-compose up -d
