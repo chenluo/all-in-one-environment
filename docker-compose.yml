@@ -133,6 +133,12 @@ services:
     environment:
       POSTGRES_PASSWORD: password
 
+  redis:
+    container_name: redis
+    ports:
+      - "6379:6379"
+    image: redis:6.2-alpine
+    command: redis-server --save 20 1 --loglevel warning 
 
 volumes:
   mysql-data:
