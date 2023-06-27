@@ -13,10 +13,22 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.2
     container_name: zookeeper
+    ports:
+      - "2181:2181"
     environment:
       ZOOKEEPER_CLIENT_PORT: 2181
       ZOOKEEPER_TICK_TIME: 2000
       JVM_OPTS: "-Xms512M -Xmx512M"
+
+  zookeeper-navigator:
+    image: elkozmon/zoonavigator:latest
+    container_name: zookeeper-navigator
+    links:
+      - "zookeeper:zookeeper"
+    ports:
+      - "9001:9001"
+    environment:
+      HTTP_PORT: 9001
 
   broker:
     image: confluentinc/cp-kafka:7.3.2
