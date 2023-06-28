@@ -3,6 +3,7 @@ services:
   mysqld:
     image: mysql:8.0.32
     container_name: mysql
+    restart: always
     ports:
       - 3306:3306
     volumes:
@@ -13,6 +14,7 @@ services:
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.2
     container_name: zookeeper
+    restart: always
     ports:
       - "2181:2181"
     environment:
@@ -23,6 +25,7 @@ services:
   zookeeper-navigator:
     image: elkozmon/zoonavigator:latest
     container_name: zookeeper-navigator
+    restart: always
     links:
       - "zookeeper:zookeeper"
     ports:
@@ -33,6 +36,7 @@ services:
   broker:
     image: confluentinc/cp-kafka:7.3.2
     container_name: broker
+    restart: always
     ports:
     # To learn about configuring Kafka for access across networks see
     # https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
@@ -57,6 +61,7 @@ services:
   kafdrop:
     image: obsidiandynamics/kafdrop
     container_name: kafdrop
+    restart: always
     ports:
       - "9000:9000"
     links:
@@ -114,6 +119,7 @@ services:
       #user: 472:0
     ports:
       - "3000:3000"
+    restart: always
     links:
       - prometheus:prometheus
     depends_on:
@@ -128,6 +134,7 @@ services:
   mysqld-exporter:
     container_name: mysqld-exporter
     image: prom/mysqld-exporter
+    restart: always
     ports:
       - "9104:9104"
     links:
@@ -141,16 +148,31 @@ services:
     container_name: pg
     ports:
       - "5432:5432"
+    restart: always
     image: postgres
     environment:
       POSTGRES_PASSWORD: password
 
   redis:
     container_name: redis
+    restart: always
     ports:
       - "6379:6379"
     image: redis:6.2-alpine
     command: redis-server --save 20 1 --loglevel warning 
+
+  redis-commander:
+    container_name: redis-commander
+    hostname: redis-commander
+    image: ghcr.io/joeferner/redis-commander:latest
+    restart: always
+    links:
+      - "redis:redis"
+    environment:
+      REDIS_HOSTS: local:redis:6379
+    ports:
+    - "9002:8081"
+  
 
 volumes:
   mysql-data:
