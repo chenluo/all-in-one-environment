@@ -103,7 +103,6 @@ services:
       - broker
     volumes:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
-      - prometheus-data:/prometheus
     ports:
       - "9090:9090"
     command:
@@ -125,7 +124,6 @@ services:
     depends_on:
       - prometheus
     volumes:
-      - grafana-data:/var/lib/grafana
       - ./config/grafana/grafana.ini:/etc/grafana/grafana.ini
     environment:
       GF_PATHS_CONFIG: "/etc/grafana/grafana.ini"
@@ -176,5 +174,3 @@ services:
 
 volumes:
   mysql-data:
-  prometheus-data:
-  grafana-data:
