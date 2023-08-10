@@ -11,6 +11,17 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: mysql
 
+        #mysqld-p1600x:
+        #  image: mysql:8.0.32
+        #  container_name: mysql-on-p1600x
+        #  restart: always
+        #  ports:
+        #    - 3307:3306
+        #  volumes:
+        #    - /media/chen/b61aac28-dd58-4ef9-b61b-cf518ea8a9e5/mysql-data:/var/lib/mysql
+        #  environment:
+        #    MYSQL_ROOT_PASSWORD: mysql
+
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.2
     container_name: zookeeper
@@ -137,9 +148,11 @@ services:
       - "9104:9104"
     links:
       - mysqld:mysqld
+        #- mysqld-p1600x:mysqld-p1600x
     depends_on:
       - mysqld
     environment:
+      # DATA_SOURCE_NAME: "root:mysql@(mysqld-p1600x:3306)/"
       DATA_SOURCE_NAME: "root:mysql@(mysqld:3306)/"
 
   postgres:
