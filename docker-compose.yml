@@ -2,7 +2,7 @@ version: "3.7"
 services:
   mysqld:
     image: mysql:8.0.32
-    container_name: mysql
+    container_name: mysqld
     restart: always
     ports:
       - 3306:3306
@@ -11,16 +11,16 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: mysql
 
-        #mysqld-p1600x:
-        #  image: mysql:8.0.32
-        #  container_name: mysql-on-p1600x
-        #  restart: always
-        #  ports:
-        #    - 3307:3306
-        #  volumes:
-        #    - /media/chen/b61aac28-dd58-4ef9-b61b-cf518ea8a9e5/mysql-data:/var/lib/mysql
-        #  environment:
-        #    MYSQL_ROOT_PASSWORD: mysql
+  mysqld-p1600x:
+    image: mysql:8.0.32
+    container_name: mysql-on-p1600x
+    restart: always
+    ports:
+      - 3307:3306
+    volumes:
+      - /media/chen/b61aac28-dd58-4ef9-b61b-cf518ea8a9e51/mysql-vol:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql
 
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.2
@@ -49,8 +49,8 @@ services:
     container_name: broker
     restart: always
     ports:
-    # To learn about configuring Kafka for access across networks see
-    # https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
+      # To learn about configuring Kafka for access across networks see
+      # https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
       - "9092:9092"
       - "9400:9400"
     depends_on:
@@ -63,7 +63,7 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_OPTS: -javaagent:/jmx_exporter/jmx_prometheus_javaagent-0.17.2.jar=9400:/jmx_exporter_cfgs/kafka_broker.yml
+      KAFKA_OPTS: -javaagent:/jmx_exporter/jmx_prometheus_javaagent.jar=9400:/jmx_exporter_cfgs/kafka_broker.yml
       JVM_OPTS: "-Xms1G -Xmx1G "
     volumes:
       - ./apps/jmx_exporter:/jmx_exporter
@@ -107,10 +107,12 @@ services:
     links:
       - node-exporter:node-exporter
       - mysqld-exporter:mysqld-exporter
+      - mysqld-exporter-p1600x:mysqld-exporter-p1600x
       - broker:broker
     depends_on:
       - node-exporter
       - mysqld-exporter
+      - mysqld-exporter-p1600x
       - broker
     volumes:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
@@ -136,6 +138,7 @@ services:
       - prometheus
     volumes:
       - ./config/grafana/grafana.ini:/etc/grafana/grafana.ini
+      - grafana-storage:/var/lib/grafana
     environment:
       GF_PATHS_CONFIG: "/etc/grafana/grafana.ini"
 
@@ -154,6 +157,19 @@ services:
     environment:
       # DATA_SOURCE_NAME: "root:mysql@(mysqld-p1600x:3306)/"
       DATA_SOURCE_NAME: "root:mysql@(mysqld:3306)/"
+
+  mysqld-exporter-p1600x:
+    container_name: mysqld-exporter-p1600x
+    image: prom/mysqld-exporter
+    restart: always
+    ports:
+      - "9105:9104"
+    links:
+      - mysqld-p1600x:mysqld-p1600x
+    depends_on:
+      - mysqld-p1600x
+    environment:
+      DATA_SOURCE_NAME: "root:mysql@(mysqld-p1600x:3306)/"
 
   postgres:
     container_name: pg
@@ -182,8 +198,20 @@ services:
     environment:
       REDIS_HOSTS: local:redis:6379
     ports:
-    - "9002:8081"
-  
+      - "9002:8081"
+
+  splunk:
+    container_name: splunk
+    hostname: splunk
+    image: splunk/splunk:latest
+    restart: always
+    ports:
+      - "8000:8000"
+    environment:
+      SPLUNK_START_ARGS: --accept-license
+      SPLUNK_PASSWORD: password
+
 
 volumes:
   mysql-data:
+  grafana-storage:
