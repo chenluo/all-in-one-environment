@@ -3,7 +3,7 @@ services:
   mysqld:
     image: mysql:8.0.32
     container_name: mysqld
-    restart: always
+    restart: 'no'
     ports:
       - 3306:3306
     volumes:
@@ -11,21 +11,10 @@ services:
     environment:
       MYSQL_ROOT_PASSWORD: mysql
 
-  mysqld-p1600x:
-    image: mysql:8.0.32
-    container_name: mysql-on-p1600x
-    restart: always
-    ports:
-      - 3307:3306
-    volumes:
-      - /media/chen/b61aac28-dd58-4ef9-b61b-cf518ea8a9e51/mysql-vol:/var/lib/mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: mysql
-
   zookeeper:
     image: confluentinc/cp-zookeeper:7.3.2
     container_name: zookeeper
-    restart: always
+    restart: 'no'
     ports:
       - "2181:2181"
     environment:
@@ -36,7 +25,7 @@ services:
   zookeeper-navigator:
     image: elkozmon/zoonavigator:latest
     container_name: zookeeper-navigator
-    restart: always
+    restart: 'no'
     links:
       - "zookeeper:zookeeper"
     ports:
@@ -47,7 +36,7 @@ services:
   broker:
     image: confluentinc/cp-kafka:7.3.2
     container_name: broker
-    restart: always
+    restart: 'no'
     ports:
       # To learn about configuring Kafka for access across networks see
       # https://www.confluent.io/blog/kafka-client-cannot-connect-to-broker-on-aws-on-docker-etc/
@@ -72,7 +61,7 @@ services:
   kafdrop:
     image: obsidiandynamics/kafdrop
     container_name: kafdrop
-    restart: always
+    restart: 'no'
     ports:
       - "9000:9000"
     links:
@@ -103,7 +92,7 @@ services:
   prometheus:
     image: prom/prometheus:latest
     container_name: prometheus
-    restart: unless-stopped
+    restart: 'no'
     links:
       - node-exporter:node-exporter
       - mysqld-exporter:mysqld-exporter
@@ -131,7 +120,7 @@ services:
       #user: 472:0
     ports:
       - "3000:3000"
-    restart: always
+    restart: 'no'
     links:
       - prometheus:prometheus
     depends_on:
@@ -146,43 +135,28 @@ services:
   mysqld-exporter:
     container_name: mysqld-exporter
     image: prom/mysqld-exporter
-    restart: always
+    restart: 'no'
     ports:
       - "9104:9104"
     links:
       - mysqld:mysqld
-        #- mysqld-p1600x:mysqld-p1600x
     depends_on:
       - mysqld
     environment:
-      # DATA_SOURCE_NAME: "root:mysql@(mysqld-p1600x:3306)/"
       DATA_SOURCE_NAME: "root:mysql@(mysqld:3306)/"
-
-  mysqld-exporter-p1600x:
-    container_name: mysqld-exporter-p1600x
-    image: prom/mysqld-exporter
-    restart: always
-    ports:
-      - "9105:9104"
-    links:
-      - mysqld-p1600x:mysqld-p1600x
-    depends_on:
-      - mysqld-p1600x
-    environment:
-      DATA_SOURCE_NAME: "root:mysql@(mysqld-p1600x:3306)/"
 
   postgres:
     container_name: pg
     ports:
       - "5432:5432"
-    restart: always
+    restart: 'no'
     image: postgres
     environment:
       POSTGRES_PASSWORD: password
 
   redis:
     container_name: redis
-    restart: always
+    restart: 'no'
     ports:
       - "6379:6379"
     image: redis:6.2-alpine
@@ -192,7 +166,7 @@ services:
     container_name: redis-commander
     hostname: redis-commander
     image: ghcr.io/joeferner/redis-commander:latest
-    restart: always
+    restart: 'no'
     links:
       - "redis:redis"
     environment:
@@ -204,14 +178,48 @@ services:
     container_name: splunk
     hostname: splunk
     image: splunk/splunk:latest
-    restart: always
+    restart: 'no'
     ports:
       - "8000:8000"
     environment:
       SPLUNK_START_ARGS: --accept-license
       SPLUNK_PASSWORD: password
 
+  sonarqube:
+    image: sonarqube:community
+    hostname: sonarqube
+    container_name: sonarqube
+    depends_on:
+      -sonarqube-db
+    environment:
+      SONAR_JDBC_URL: jdbc:postgresql://sonarqube-db:5432/sonar
+      SONAR_JDBC_USERNAME: sonar
+      SONAR_JDBC_PASSWORD: sonar
+    volumes:
+      - sonarqube_data:/opt/sonarqube/data
+      - sonarqube_extensions:/opt/sonarqube/extensions
+      - sonarqube_logs:/opt/sonarqube/logs
+    ports:
+      - "10002:9000"
+
+  sonarqube-db:
+    image: postgres:13
+    hostname: postgresql
+    container_name: postgresql
+    environment:
+      POSTGRES_USER: sonar
+      POSTGRES_PASSWORD: sonar
+      POSTGRES_DB: sonar
+    volumes:
+      - postgresql:/var/lib/postgresql
+      - postgresql_data:/var/lib/postgresql/data
+
 
 volumes:
   mysql-data:
   grafana-storage:
+  sonarqube_data:
+  sonarqube_extensions:
+  sonarqube_logs:
+  postgresql:
+  postgresql_data:
