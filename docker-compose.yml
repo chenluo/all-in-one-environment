@@ -96,12 +96,12 @@ services:
     links:
       - node-exporter:node-exporter
       - mysqld-exporter:mysqld-exporter
-      - mysqld-exporter-p1600x:mysqld-exporter-p1600x
+        #- mysqld-exporter-p1600x:mysqld-exporter-p1600x
       - broker:broker
     depends_on:
       - node-exporter
       - mysqld-exporter
-      - mysqld-exporter-p1600x
+        #- mysqld-exporter-p1600x
       - broker
     volumes:
       - ./config/prometheus.yml:/etc/prometheus/prometheus.yml
